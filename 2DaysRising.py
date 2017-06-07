@@ -29,7 +29,7 @@ for k,fil in enumerate(files):
 	data = np.loadtxt(fil,ndmin=2)
 	#lines = fh.readlines(); print lines
 	Ndays = len(data) 	# the no. of the days
-	print 'number of days in %s: '%(namelist[k]), Ndays
+	print 'number of days in %s: %d\n'%(namelist[k], Ndays)
 
 	if Ndays > 2:	# skip over empty files
 		date = data[:,0]	# transaction date
