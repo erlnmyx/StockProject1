@@ -45,3 +45,5 @@ for k,fil in enumerate(files[0:1]):
 	
 	if flag == 0:	
 		print 'no such condition, retry rising_rate'
+
+fh.close()
