@@ -7,7 +7,7 @@ from glob import glob
 
 
 # parameter
-rising_rate = 4.6
+rising_rate = 9.6
 c1 = 8		# condition 1
 
 # data directory
@@ -24,25 +24,27 @@ for i in range(L):
 	namelist.append(files[i].split('/')[-1].split('.')[0])
 
 # search price rising for two days
-for k,fil in enumerate(files[0:1]):
+for k,fil in enumerate(files):
 	fh = open(fil,'r')
-	data = np.loadtxt(fil)
+	data = np.loadtxt(fil,ndmin=2)
+	#lines = fh.readlines(); print lines
 	Ndays = len(data) 	# the no. of the days
 	print 'number of days in %s: '%(namelist[k]), Ndays
 
-	date = data[:,0]	# transaction date
-	op = data[:,1]		# opening price
-	hp = data[:,2]		# highest price
-	lp = data[:,3]		# lowest price
-	cp = data[:,4]		# closing price
+	if Ndays > 2:	# skip over empty files
+		date = data[:,0]	# transaction date
+		op = data[:,1]		# opening price
+		hp = data[:,2]		# highest price
+		lp = data[:,3]		# lowest price
+		cp = data[:,4]		# closing price
 
-	flag = 0
-	for j in range(2,Ndays):
-		if cp[j]>= (1+rising_rate/100.)*cp[j-1] and cp[j-1]>= (1+rising_rate/100.)*cp[j-2] \
-		and cp[j-1] != op[j-1] and cp[j-2] != op[j-2] and op[j] <= (1+c1/100.)*cp[j-1]:
-			flag += 1
-			print 'code:',namelist[k], 'date:',str(int(date[j])), data[j-1], data[j]
-	
+		flag = 0
+		for j in range(2,Ndays):
+			if cp[j]>= (1+rising_rate/100.)*cp[j-1] and cp[j-1]>= (1+rising_rate/100.)*cp[j-2] \
+			and cp[j-1] != op[j-1] and cp[j-2] != op[j-2] and op[j] <= (1+c1/100.)*cp[j-1]:
+				flag += 1
+				print 'code:',namelist[k], 'date:',str(int(date[j])), #data[j-1], data[j]
+		
 	if flag == 0:	
 		print 'no such condition, retry rising_rate'
 
