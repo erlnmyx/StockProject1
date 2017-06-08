@@ -9,7 +9,7 @@ from glob import glob
 # parameter
 rising_rate = 9.6
 c1 = 8		# condition 1, 
-c2 = 45     # 流通市值小于c2（亿）
+c2 = 45		# 流通市值小于c2（亿）
 # data directory
 #db_localpath = '/Users/chenchen/Desktop/Stock/database'
 db_localpath = '/Users/erln/Desktop/Stock/database'
