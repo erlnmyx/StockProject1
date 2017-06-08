@@ -6,18 +6,25 @@ import numpy as np
 from glob import glob
 
 
-# parameter
-rising_rate = 9.6
-c1 = 8		# condition 1, 
-c2 = 45     # 流通市值小于c2（亿）
+# parameters
+c1 = 8		# 前一天涨幅小于c1% 
+c2 = 250    # 计算范围在c2天交易日内
+c3 = 9.6    # 涨幅大于c3%视为涨停
+c4 = 45     # 流通市值小于c4（亿）
+c5 = 120    # 总市值小于c5（亿）
+
 # data directory
 #db_localpath = '/Users/chenchen/Desktop/Stock/database'
 db_localpath = '/Users/erln/Desktop/Stock/database'
 dayK_yes_files = '/dayK_yes/*'
+extrainfo_file = '/extrainfo.txt'
 
 # glob all the files
 files = glob(db_localpath+dayK_yes_files)
+extrainfo = glob(db_localpath+extrainfo_file)
 L = len(files)
+
+# 
 
 # extract stock code from the file name
 namelist = list()
@@ -39,15 +46,15 @@ for k,fil in enumerate(files):
 		cp = data[:,4]		# closing price
 
 		flag = 0
-		if Ndays > 252: # only calculate the most recent year
-			for j in range(Ndays-250,Ndays):
-				if cp[j]>= (1+rising_rate/100.)*cp[j-1] and cp[j-1]>= (1+rising_rate/100.)*cp[j-2] \
+		if Ndays > c2+2: # only calculate the most recent year
+			for j in range(Ndays-c2,Ndays):
+				if cp[j]>= (1+c3/100.)*cp[j-1] and cp[j-1]>= (1+c3/100.)*cp[j-2] \
 				and cp[j-1] != op[j-1] and cp[j-2] != op[j-2] and op[j] <= (1+c1/100.)*cp[j-1]:
 					flag += 1
 					print 'ID:',namelist[k], 'date:',str(int(date[j])), '\n' #data[j-1], data[j]
 		else:
 			for j in range(2,Ndays):
-				if cp[j]>= (1+rising_rate/100.)*cp[j-1] and cp[j-1]>= (1+rising_rate/100.)*cp[j-2] \
+				if cp[j]>= (1+c3/100.)*cp[j-1] and cp[j-1]>= (1+c3/100.)*cp[j-2] \
 				and cp[j-1] != op[j-1] and cp[j-2] != op[j-2] and op[j] <= (1+c1/100.)*cp[j-1]:
 					flag += 1
 				print 'ID:',namelist[k], 'date:',str(int(date[j])), '\n' #data[j-1], data[j]
