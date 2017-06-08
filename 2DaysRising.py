@@ -14,7 +14,7 @@ c5 = 120    # 总市值小于c5（亿）
 
 # data directory
 #db_localpath = '/Users/chenchen/Desktop/Stock/database'
-db_localpath = '/Users/erln/Desktop/Stock/database'
+db_localpath = '/Users/erln/Desktop/Stock/database'	# 2球
 dayK_yes_files = '/dayK_yes/*'
 extrainfo_file = '/extrainfo.txt'
 
