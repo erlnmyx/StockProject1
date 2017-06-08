@@ -11,6 +11,7 @@ c2 = 250    # 计算范围在c2天交易日内
 c3 = 9.6    # 涨幅大于c3%视为涨停
 c4 = 45     # 流通市值小于c4（亿）
 c5 = 120    # 总市值小于c5（亿）
+c6 = 1.2    # 成交量比前一日放大c6倍
 
 # data directory
 #db_localpath = '/Users/chenchen/Desktop/Stock/database'
