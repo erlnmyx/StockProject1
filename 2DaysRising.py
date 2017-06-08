@@ -5,7 +5,6 @@
 import numpy as np
 from glob import glob
 
-
 # parameters
 c1 = 8		# 前一天涨幅小于c1% 
 c2 = 250    # 计算范围在c2天交易日内
