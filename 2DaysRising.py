@@ -1,5 +1,5 @@
-# -*- coding: utf-8 -*-
 #!/usr/bin/env python
+# -*- coding: utf-8 -*-
 #
 # this script is looking for two-consecutive-day price rising
 
@@ -16,18 +16,21 @@ c5 = 120    # 总市值小于c5（亿）
 c6 = 1.2    # 成交量比前一日放大c6倍
 
 # data directory
-#db_localpath = '/Users/chenchen/Desktop/Stock/database'
-db_localpath = '/Users/erln/Desktop/Stock/database'	# 2球
+db_localpath = '/Users/chenchen/Desktop/Stock/database'
+#db_localpath = '/Users/erln/Desktop/Stock/database'	# 2球
 dayK_yes_files = '/dayK_yes/*'
 
 # 导入其他类数据文件（总股本，流通股本）
 Equityinfo = list()
-Equityinfo = np.loadtxt('/Users/erln/Desktop/Stock/database/Equityinfo.txt') # 导入股本数据
+Equityinfo = np.loadtxt('/Users/chenchen/Desktop/Stock/database/Equityinfo.txt') # 导入股本数据
+#Equityinfo = np.loadtxt('/Users/erln/Desktop/Stock/database/Equityinfo.txt') # 导入股本数据
+
 StockID = Equityinfo[:,0]  # 股票代码
+
 StockID = list(StockID)
 
 for i in range(len(StockID)):
-	StockID[i] = "%06d"%(int(StockID[i])
+	StockID[i] = "%06d" % (int(StockID[i]))
 
 FoE = Equityinfo[:,1]      # 流通股本(亿) Flow of Equity
 E = Equityinfo[:,2]        # 总股本(亿) Equity
@@ -70,4 +73,4 @@ for k,fil in enumerate(files):
 					print 'ID:',namelist[k], 'date:',str(int(date[j])), '\n' #data[j-1], data[j]
 
 
-fh.close()
+#fh.close()
