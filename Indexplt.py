@@ -8,6 +8,7 @@ import matplotlib.pyplot as plt
 import matplotlib
 import numpy as np
 from datetime import date
+from rolling_window import *		# this module is built in script 'rolling_window' by Chen
 
 
 # plot parameter setup
@@ -22,20 +23,6 @@ matplotlib.rcParams['font.family']='Times New Roman'
 
 
 ma = [50,150,250,500,750] 		# moving average window
-
-
-# for moving average
-def rolling_window(a, window):
-    """ Efficient rolling statistics with NumPy: This is applied to Picker._statistics() to calculate statistics
-        and Summary.threshold() to calcuate threshold to trigger event
-        Reference from:
-        http://www.rigtorp.se/2011/01/01/rolling-statistics-numpy.html
-    """
-    shape = a.shape[:-1] + (a.shape[-1] - window + 1, window)
-    strides = a.strides + (a.strides[-1],)
-    return np.lib.stride_tricks.as_strided(a, shape=shape, strides=strides) 
-
-
 
 fig = plt.figure(figsize=(18,8))
 ax = fig.add_subplot(1,1,1)
