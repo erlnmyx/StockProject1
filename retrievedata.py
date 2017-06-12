@@ -28,7 +28,8 @@ matplotlib.rcParams["ytick.minor.size"]=5
 matplotlib.rcParams["xtick.labelsize"]=16
 matplotlib.rcParams["ytick.labelsize"]=16
 matplotlib.rcParams['font.family']='Times New Roman'
-
+matplotlib.rcParams['font.sans-serif'] = ['FangSong'] 	# 指定默认字体
+matplotlib.rcParams['axes.unicode_minus'] = False 		# 解决保存图像是负号'-'显示为方块的问题
 
 # ========================================================================================
 # retrieve data from URL
@@ -37,8 +38,11 @@ url = "http://www.aigaogao.com/tools/history.html?s=%s"%(stock_id)
 
 html = urllib.urlopen(url).read()
 soup = BeautifulSoup(html, "html.parser")
+#print soup
 
+# retrieve headers
 stock_name = soup.head.title.string.split('(')[0]
+
 rows = soup.findAll('td', {'class' : 'altertd'})
 N = len(rows)
 
@@ -156,7 +160,7 @@ OHLC.reverse()
 # =============================================================================================
 # plot K and moving average
 fig = plt.figure(figsize=(18,10))
-ax1 = plt.subplot2grid((7,1), (0,0), rowspan=4, colspan=1)
+ax1 = plt.subplot(2,1,1)
 
 ma = [5,15,25] 		# moving average window
 
@@ -178,6 +182,7 @@ ax1.xaxis.set_major_locator(mticker.MaxNLocator(10))
 ax1.yaxis.grid(color='gray', linestyle='dashed')
 
 plt.ylim(0.1, plt.ylim()[-1])			# awesome to fix only one limit of the axis!!!
+plt.ylabel(u'价格（元）')
 plt.title(stock_name+"(%06d)"%(stock_id))
 
 
@@ -185,7 +190,7 @@ plt.title(stock_name+"(%06d)"%(stock_id))
 # plot barplot of the transaction volume
 # get data from candlesticks for a bar plot
 
-ax2 = plt.subplot2grid((7,1), (5,0), rowspan=2, colspan=1, sharex = ax1)		# sharex = ax1 to zoom figures together
+ax2 = plt.subplot(2,1,2,sharex = ax1)		# sharex = ax1 to zoom figures together
 
 dates_vol = [x[0] for x in OHLC]
 dates_vol = np.asarray(dates_vol)
@@ -197,9 +202,11 @@ pos = np.array(OPENP)-np.array(CLOSEP)<0  	# return True or False
 neg = np.array(OPENP)-np.array(CLOSEP)>0 	# return True or False
 ax2.bar(dates_vol[pos],vol[pos],color='#db3f3f',width=1,align='center')
 ax2.bar(dates_vol[neg],vol[neg],color='#77d879',width=1,align='center')
+plt.ylabel(u'成交量（万手）')
 
 datacursor()
 
+plt.tight_layout()
 plt.show()
 
 		
