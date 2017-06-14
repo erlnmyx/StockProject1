@@ -61,8 +61,9 @@ for ma_i in ma:
 	MA_win = rolling_window(np.array(CLOSING), ma_i)
 	MA = np.mean(MA_win,axis = 1)
 	TIME_MA = TIME[ma_i-1:]
-	Color=ax._get_lines.color_cycle.next()			# get color cycle automatically
-	plt.plot(TIME_MA,MA,linewidth = 2,color = Color)
+	#Color=ax._get_lines.color_cycle.next()			# get color cycle automatically
+	Color=next(ax._get_lines.prop_cycler)['color']
+	plt.plot(TIME_MA,MA,linewidth = 0.5,color = Color)
 	plt.legend(ma, loc="upper left", shadow=True, title="Moving Average (Days)", fancybox=True)
 
 

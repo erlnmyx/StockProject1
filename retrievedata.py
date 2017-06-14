@@ -10,6 +10,7 @@ import matplotlib
 import numpy as np
 import urllib
 import datetime as dt
+from pylab import mpl
 from bs4 import BeautifulSoup
 from datetime import datetime
 from rolling_window import *		# this module is built in script 'rolling_window' by Chen
@@ -18,6 +19,10 @@ from mpldatacursor import datacursor
 
 import matplotlib.dates as mdates
 import matplotlib.ticker as mticker
+
+# 正常显示中文
+mpl.rcParams['font.sans-serif'] = ['FangSong'] # 指定默认字体
+mpl.rcParams['axes.unicode_minus'] = False # 解决保存图像是负号'-'显示为方块的问题
 
 # plot parameter setup
 matplotlib.rcParams["axes.labelsize"]="large"
@@ -28,8 +33,8 @@ matplotlib.rcParams["ytick.minor.size"]=5
 matplotlib.rcParams["xtick.labelsize"]=16
 matplotlib.rcParams["ytick.labelsize"]=16
 matplotlib.rcParams['font.family']='Times New Roman'
-matplotlib.rcParams['font.sans-serif'] = ['FangSong'] 	# 指定默认字体
-matplotlib.rcParams['axes.unicode_minus'] = False 		# 解决保存图像是负号'-'显示为方块的问题
+#matplotlib.rcParams['font.sans-serif'] = ['FangSong'] 	# 指定默认字体
+#matplotlib.rcParams['axes.unicode_minus'] = False 		# 解决保存图像是负号'-'显示为方块的问题
 
 # ========================================================================================
 # retrieve data from URL
@@ -169,7 +174,8 @@ for ma_i in ma:
 	MA_win = rolling_window(np.array(CLOSEP), ma_i)
 	MA = np.mean(MA_win,axis = 1)
 	TIME_MA = TIME[ma_i-1:]
-	Color=ax1._get_lines.color_cycle.next()			# get color cycle automatically
+	#Color=ax1._get_lines.color_cycle.next()			# get color cycle automatically
+	Color=next(ax1._get_lines.prop_cycler)['color']
 	plt.plot(TIME_MA,MA,linewidth = .5,color = Color)
 	plt.legend(ma, loc="upper left", shadow=True, title="Moving Average (Days)", fancybox=True)
 
