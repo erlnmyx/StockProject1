@@ -18,19 +18,18 @@ c7 = 20170613  # 数据最新一天
 c8 = 0.33      # 仓位
 
 # data directory
-#db_localpath = '/Users/chenchen/Desktop/Stock/database'
-db_localpath = '/Users/erln/Desktop/Stock/database'	# 2球
+db_localpath = '/Users/chenchen/Desktop/Stock/database'
+#db_localpath = '/Users/erln/Desktop/Stock/database'	# 2球
 dayK_yes_files = '/dayK_yes/*'
 
 # 导入其他类数据文件（总股本，流通股本）
-Equityinfo = list()
-#Equityinfo = np.loadtxt('/Users/chenchen/Desktop/Stock/database/Equityinfo.txt') # 导入股本数据
-Equityinfo = np.loadtxt('/Users/erln/Desktop/Stock/database/Equityinfo.txt') # 导入股本数据
+#Equityinfo = list()
+Equityinfo = np.loadtxt('/Users/chenchen/Desktop/Stock/database/Equityinfo.txt') # 导入股本数据
+#Equityinfo = np.loadtxt('/Users/erln/Desktop/Stock/database/Equityinfo.txt') # 导入股本数据
 
+# retrieve StockID
 StockID = Equityinfo[:,0]  # 股票代码
-
 StockID = list(StockID)
-
 for i in range(len(StockID)):
 	StockID[i] = "%06d" % (int(StockID[i]))
 
@@ -42,20 +41,19 @@ files = glob(db_localpath+dayK_yes_files)
 L = len(files)
 
 # parameters
-namelist = list()   # namelist for all stocks
 Yield = 1           # 收益率
 count1 = 0          # 计数因子，用来储存select stocks的数量
 count2 = 0          # 计数因子，用来储存失败（利润小于0）的次数
 count3 = 0          # 计数因子，
 count4 = 0          # 计数因子，
-count5 = 0          # 计数因子，
-count6 = 0          # 计数因子，
-count7 = 0          # 计数因子，
-count8 = 0          # 计数因子，
-count9 = 0          # 计数因子，
-count10 = 0         # 计数因子，
-count11 = 0         # 计数因子，
-count12 = 0         # 计数因子，
+count5 = 0          # 计数因子，最近一年高开涨停数量
+count6 = 0          # 计数因子，最近一年高开没涨停数量
+count7 = 0          # 计数因子，最近一年低开直接卖出数量
+count8 = 0          # 计数因子，最近一年内profit=0的数量
+count9 = 0          # 计数因子，不到一年高开涨停数量
+count10 = 0         # 计数因子，不到一年高开没涨停数量
+count11 = 0         # 计数因子，不到一年低开直接卖出数量
+count12 = 0         # 计数因子，不到一年内profit=0的数量
 
 # 均线定义
 MA1 = 5   # 5日均线
@@ -76,6 +74,7 @@ output6 = list()
 output7 = list()
 output8 = list()
 
+namelist = list()   # namelist for all stocks
 for i in range(L):
 	namelist.append(files[i].split('/')[-1].split('.')[0])
 
@@ -83,17 +82,17 @@ for i in range(L):
 for k,fil in enumerate(files):
 	kID = StockID.index(namelist[k]) # 找到股本数据中某个股票所对应的index
 	data = np.loadtxt(fil,ndmin=2)
-	Ndays = len(data) 	# the no. of the days
-	if Ndays > 2:	# skip over empty files
+	Ndays = len(data) 		# the no. of days
+	if Ndays > 2:			# skip over empty files
 		date = data[:,0]	# transaction date
-		op = data[:,1]		# opening price
+		op = data[:,1]		# open price
 		hp = data[:,2]		# highest price
 		lp = data[:,3]		# lowest price
-		cp = data[:,4]		# closing price
+		cp = data[:,4]		# close price
 
 		if Ndays > c2+2: # only calculate the most recent year
 			for j in range(Ndays-c2,Ndays):
-				if cp[j]>= (1+c3/100.)*cp[j-1] and cp[j-1] >= (1+c3/100.)*cp[j-2] \
+				if cp[j] >= (1+c3/100.)*cp[j-1] and cp[j-1] >= (1+c3/100.)*cp[j-2] \
 				and cp[j-1] != op[j-1] and cp[j-2] != op[j-2] and op[j] <= (1+c1/100.)*cp[j-1] \
 				and cp[j-2] < cp[j-3]*(1+(c3/100.-0.03)) and cp[j]*FoE[kID] <= c4 and cp[j]*E[kID] <= c5 \
 				and E[kID]>0.01 and int(date[j])> c7 - 10000:
@@ -102,13 +101,13 @@ for k,fil in enumerate(files):
 					#and cp[j-1] > np.mean(cp[j-1-len(cp)-MA1:j-1-len(cp)])
 
 					if int(date[j]) < c7:
-						if op[j+1] > cp[j] and cp[j+1] > cp[j] * (1+c3/100):
+						if op[j+1] > cp[j] and cp[j+1] >= cp[j] * (1+c3/100):
 							SP = cp[j+1] # SP=selling price, 如果高开且涨停，则在涨停价卖出
 							count5 = count5 + 1
 						elif op[j+1] > cp[j] and cp[j+1] < cp[j] * (1+c3/100):
 							SP = (op[j+1] + hp[j+1])/2 # 如果高开但没涨停，假设卖出价位（开盘价+最高价）/2
 							count6 = count6 + 1
-						elif op[j+1] < cp[j]:
+						elif op[j+1] <= cp[j]:
 							SP = op[j+1] # 如果低开，直接卖出
 							count7 = count7 + 1
 						Profit = (SP-cp[j])/cp[j]*c8 # 利润
@@ -130,17 +129,17 @@ for k,fil in enumerate(files):
 		else:
 			for j in range(2,Ndays):
 				if cp[j]>= (1+c3/100.)*cp[j-1] and cp[j-1]>= (1+c3/100.)*cp[j-2] \
-				and cp[j-1] != op[j-1] and cp[j-2] != op[j-2] and op[j] <= (1+c1/100.)*cp[j-1] \
-				and cp[j-2] < cp[j-3]*(1+(c3/100.-0.03)) and cp[j]*FoE[kID] <= c4 and cp[j]*E[kID] \
-				<= c5 and E[kID]>0.01 and int(date[j])> c7 - 10000:
+				and cp[j-1] != op[j-1] and cp[j-2] != op[j-2] \
+				and op[j] <= (1+c1/100.)*cp[j-1] and cp[j-2] < cp[j-3]*(1+(c3/100.-0.03)) \
+				and cp[j]*FoE[kID] <= c4 and cp[j]*E[kID] <= c5 and E[kID]>0.01 and int(date[j])> c7 - 10000:
 					if int(date[j]) < c7:
-						if op[j+1] > cp[j] and cp[j+1] > cp[j] * (1+c3/100):
+						if op[j+1] > cp[j] and cp[j+1] >= cp[j] * (1+c3/100):
 							SP = cp[j+1] # SP=selling price, 如果高开且涨停，则在涨停价卖出
 							count9 = count9 + 1
 						elif op[j+1] > cp[j] and cp[j+1] < cp[j] * (1+c3/100):
 							SP = (op[j+1] + hp[j+1])/2 # 如果高开但没涨停，假设卖出价位（开盘价+最高价）/2
 							count10 = count10 + 1
-						elif op[j+1] < cp[j]:
+						elif op[j+1] <= cp[j]:
 							SP = op[j+1] # 如果低开，直接卖出
 							count11 = count11 + 1
 						Profit = (SP-cp[j])/cp[j]*c8 # 利润
@@ -183,17 +182,11 @@ for i in range(count2):
 
 print 'fail times', count4, 'total times', count3, 'total times', count2
 
-print '老股，高开且涨停', count5
-print '老股，高开没涨停',count6
-print '老股，低开',count7
-print '老股，当天买入',count8
-print '新股，高开且涨停',count9
-print '新股，高开没涨停',count10
-print '新股，低开',count11
-print '新股，当天买入',count12
-
-
-
-
-
-
+print '老股，高开且涨停', 	count5
+print '老股，高开没涨停',	count6
+print '老股，低开',		count7
+print '老股，当天买入',	count8
+print '新股，高开且涨停',	count9
+print '新股，高开没涨停',	count10
+print '新股，低开',		count11
+print '新股，当天买入',	count12
